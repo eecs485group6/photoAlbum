@@ -1,0 +1,69 @@
+<html>
+<head>
+<script type="text/javascript" src="draghandler2.js">
+</script>
+<style>
+
+div.frame
+{
+position:absolute;
+left:500px;
+top:0px;
+width:500px;
+height:650px;
+background-color:DarkGrey;
+overflow:hidden;
+}
+div.Dragable
+{
+position:relative;
+top:0px;
+left:0px;
+padding-left:250px;
+padding-right:250px;
+height: 800px;
+background-color:black;
+}
+div.container
+{
+position:relative
+float:left;
+margin:0;
+border:2px;
+padding:0;
+width: 496px;
+height: 640px;
+background-color:black;
+opacity:1;
+text-align:center;
+display: inline-block;
+}
+img
+{
+position:relative
+float:bottom;
+margin-top:auto;
+width: 420px;
+height: auto;
+}
+
+</style>
+</head>
+<body onload="OnLoad()" style="overflow:hidden">
+<div style="position:absolute; left:5%; right:5%; width:90%; height:98%; background-color:LightGrey; opacity:0.5;"><a href="" style="color:white;position:relative;float:right;top:0px;">Close</a></div>
+<div class="frame" id="pf">
+  <div class="Dragable" id="swo" style="width:3500px; background-color:black; left:-250px;">
+	  <div class="container"><p style="color:white;">IMAGE 1</p><img src="1.jpg"></div>
+      <div class="container"><p style="color:white;">IMAGE 2</p><img src="2.jpg"></div>
+	  <div class="container"><p style="color:white;">IMAGE 3</p><img src="3.jpg"></div>
+	  <div class="container"><p style="color:white;">IMAGE 4</p><img src="4.jpg"></div>
+	  <div class="container"><p style="color:white;">IMAGE 5</p><img src="5.jpg"></div>
+<!--           <img src="1.jpg">
+	  <img src="2.jpg">
+	  <img src="3.jpg">
+	  <img src="4.jpg">
+          <img src="5.jpg"> -->
+  </div>
+</div>
+</body>
+</html>
