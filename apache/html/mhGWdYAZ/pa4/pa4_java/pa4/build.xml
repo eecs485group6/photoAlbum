@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="pa4" default="compile" basedir=".">
+    <description>
+        simple example build file
+    </description>
+  <!-- set global properties for this build -->
+  <property name="src" location="src"/>
+  <property name="build" location="build"/>
+  <property name="build.classes" location="build"/>
+  <property name="test.src" location="test"/>
+  <property name="test.build" location="build/test"/>
+  <property name="lib" location="lib"/>
+  <property name="dist"  location="dist"/>
+  <property name="test.include" value="Test*"/>
+
+  <property name="test.build.data" value="${test.build}/data" />
+  <property name="test.cache.data" value="${test.build}/cache" />
+  <property name="test.debug.data" value="${test.build}/debug" />
+
+  <path id="classpath">
+    <pathelement location="${build.classes}" />
+    <fileset dir="${lib}" >
+      <include name="**/*.jar" />
+      <exclude name="**/excluded/" />
+    </fileset>
+  </path>
+
+  <!-- the unit test classpath: uses test.src.dir for configuration -->
+  <path id="test.classpath">
+    <pathelement location="${test.build}" />
+    <pathelement location="${test.src}" />
+    <pathelement location="${build}" />
+    <path refid="classpath"/>
+  </path>
+	
+	<!-- Load all the default properties, and any the user wants    -->
+	<!-- to contribute (without having to type -D or edit this file -->
+	<property file="${user.home}/build.properties" />
+	<property file="${basedir}/build.properties" />
+	<property name="src.dir" value="${basedir}/src"/>
+	
+	  <!--this is how artifacts that get built are named-->
+	  <property name="hadoop.jar" location="${build.dir}/hadoop-${hadoop.version}-core.jar" />
+	
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+    <mkdir dir="${test.build}"/>
+  </target>
+
+  <target name="compile" depends="init"
+        description="compile the source " >
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac 
+       srcdir="${src}" 
+       destdir="${build}" 
+       classpathref="classpath" 
+       debug="true" />
+  </target>
+
+  <target name="compile-test" depends="init,compile"
+        description="compile the test source " >
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac srcdir="${test.src}" 
+           destdir="${test.build}"
+           classpathref="test.classpath" 
+           debug="true" />
+  </target>
+
+  <target name="test" depends="compile-test" >
+    <junit showoutput="no"
+           printsummary="yes"
+           haltonfailure="no"
+           fork="yes"
+           forkmode="perTest"
+           maxmemory="512m"
+           dir="${basedir}"
+           timeout="900000"
+           errorProperty="tests.failed" failureProperty="tests.failed">
+      <sysproperty key="test.build.data" value="${test.build.data}"/>
+      <sysproperty key="test.cache.data" value="${test.cache.data}"/>    	
+      <sysproperty key="test.debug.data" value="${test.debug.data}"/>
+
+      <classpath refid="test.classpath"/>
+
+      <batchtest todir="${test.build}" unless="testcase">
+        <fileset dir="${test.src}"
+	         includes="**/${test.include}.java"
+		 excludes="**/${test.exclude}.java" />
+      </batchtest>
+      <batchtest todir="${test.build}" if="testcase">
+        <fileset dir="${test.src}" includes="**/${testcase}.java"/>
+      </batchtest>
+    </junit>
+    <fail if="tests.failed">Tests failed!</fail>
+  </target>
+
+  <target name="dist" depends="compile"
+        description="generate the distribution" >
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist}/lib"/>
+
+    <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
+    <jar jarfile="${dist}/lib/pa4.jar" basedir="${build}"/>
+  </target>
+
+  <target name="clean"
+        description="clean up" >
+    <!-- Delete the ${build} and ${dist} directory trees -->
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+</project>
