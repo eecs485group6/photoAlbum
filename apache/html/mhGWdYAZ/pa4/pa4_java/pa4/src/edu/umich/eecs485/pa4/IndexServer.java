@@ -42,7 +42,7 @@ public class IndexServer extends GenericIndexServer {
   public void initServer(File fname) {
     // Do something!
   
-    System.err.println("Init server with fname " + fname);
+    //System.err.println("Init server with fname " + fname);
   }
 
   /**
@@ -85,7 +85,7 @@ public class IndexServer extends GenericIndexServer {
           Scanner check1 = new Scanner(fname); 
           while (check1.hasNext()){
             String [] checkstr = check1.nextLine().split(" ");
-            if (checkstr[0] == subQ) {
+            if (checkstr[0].equals(subQ)) {
               if (map.containsKey(checkstr[3])) 
                 map.put(checkstr[3], 
                     map.get(checkstr[3])
@@ -98,7 +98,7 @@ public class IndexServer extends GenericIndexServer {
           Scanner check2 = new Scanner(fname);
           while (check2.hasNext()){
             String [] checkstr = check2.nextLine().split(" ");
-            if (checkstr[0] == subQ2) {
+            if (checkstr[0].equals(subQ2)) {
               if (map.containsKey(checkstr[3])) 
                 map.put(checkstr[3], 
                     map.get(checkstr[3])
