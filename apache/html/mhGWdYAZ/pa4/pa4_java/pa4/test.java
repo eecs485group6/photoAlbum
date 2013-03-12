@@ -8,8 +8,9 @@ public class test {
   public static void main(String[] args) {
     try {
     File f = new File("test.txt");
-    IndexServer IS = new IndexServer(9000,f);
-    List<QueryHit> qh = IS.processQuery("big dogs");
+    IndexServer IS = new IndexServer(8000,f);
+    System.out.println("begin!");
+    List<QueryHit> qh = IS.processQuery("dogs");
     System.out.println("good "+qh.size());
     for (QueryHit q: qh) {
       System.out.println(q.getIdentifier()+ "  "+ q.getScore());

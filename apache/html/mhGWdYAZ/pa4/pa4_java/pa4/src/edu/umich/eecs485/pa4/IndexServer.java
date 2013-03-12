@@ -55,20 +55,25 @@ public class IndexServer extends GenericIndexServer {
    * Fill in this method to do something useful!
    */
   public List<QueryHit> processQuery(String query) {
-    // Do something!
+    // Query Hit result
     ArrayList<QueryHit> result = new ArrayList<QueryHit>();
+    //doc score
     HashMap<String, Double> map = new HashMap<String, Double>();
+    //hash map query strings
+    HashMap<String, Integer> querys = new HashMap<String, Integer>();
+    // filter for common strings
     HashSet<String> hs_filter = new HashSet<String>();
     boolean flag = false;
     try{
+      // set filter
       File f = new File("Redirecting.txt");
       Scanner prescan = new Scanner(f);
       while (prescan.hasNext()) {
         hs_filter.add(prescan.nextLine());
       }
-
       String [] que = query.split(" ");
       for (String subQ : que) {
+        System.out.println(subQ+ "     "+que.length);
         if (subQ.equals("&") || subQ.equals("/") || subQ.equals("-")) continue;
         if (subQ.startsWith("(") || subQ.startsWith("#")) subQ = subQ.substring(1);
         if (subQ.endsWith(")") || subQ.endsWith("!") || subQ.endsWith("?") || subQ.endsWith(","))
@@ -80,39 +85,42 @@ public class IndexServer extends GenericIndexServer {
           subQ2 = subQ.substring(subQ.indexOf('(')+1);
           subQ = subQ.substring(0, subQ.indexOf('(')); 
         } 	
-        //subQ
-        if (!hs_filter.contains(subQ)) {
-          Scanner check1 = new Scanner(fname); 
-          while (check1.hasNext()){
-            String [] checkstr = check1.nextLine().split(" ");
-            if (checkstr[0].equals(subQ)) {
-              if (map.containsKey(checkstr[3])) 
-                map.put(checkstr[3], 
-                    map.get(checkstr[3])
-                    +Double.parseDouble(checkstr[2])*Double.parseDouble(checkstr[4])/Math.sqrt(Double.parseDouble(checkstr[5])));
-              else map.put(checkstr[3],Double.parseDouble(checkstr[2])*Double.parseDouble(checkstr[4])/Math.sqrt(Double.parseDouble(checkstr[5])));
-            }
-          }
-        }
-        if (flag && !hs_filter.contains(subQ2)) {
-          Scanner check2 = new Scanner(fname);
-          while (check2.hasNext()){
-            String [] checkstr = check2.nextLine().split(" ");
-            if (checkstr[0].equals(subQ2)) {
-              if (map.containsKey(checkstr[3])) 
-                map.put(checkstr[3], 
-                    map.get(checkstr[3])
-                    +Double.parseDouble(checkstr[2])*Double.parseDouble(checkstr[4])/Math.sqrt(Double.parseDouble(checkstr[5])));
-              else map.put(checkstr[3],Double.parseDouble(checkstr[2])*Double.parseDouble(checkstr[4])/Math.sqrt(Double.parseDouble(checkstr[5])));
-            }
-          }
-        }
+        if (!hs_filter.contains(subQ))
+          if (!querys.containsKey(subQ))
+            querys.put(subQ, 1);
+          else querys.put(subQ, querys.get(subQ)+1);
+
+        if (flag && !hs_filter.contains(subQ2))
+          if (!querys.containsKey(subQ2))
+            querys.put(subQ2, 1);
+          else querys.put(subQ2, querys.get(subQ2)+1);
         flag = false;
       }
+      double total = 0;
+      for (Map.Entry<String, Integer> entry: querys.entrySet()) {
+        String q = entry.getKey();
+        int tf = entry.getValue().intValue();
+        Scanner check = new Scanner(fname);
+        while (check.hasNext()) {
+          String [] checkstr = check.nextLine().split(" ");
+          if (checkstr[0].equals(q)) {
+              double current_tfidf = 
+                Double.parseDouble(checkstr[1])*Double.parseDouble(checkstr[4])/Math.sqrt(Double.parseDouble(checkstr[5]));
+              if (map.containsKey(checkstr[3]))
+                map.put(checkstr[3],
+                    map.get(checkstr[3])+current_tfidf*tf*Double.parseDouble(checkstr[1])); // checkstr[1] == idf
+              else {
+                total += tf*tf*Double.parseDouble(checkstr[1])*Double.parseDouble(checkstr[1]);
+                map.put(checkstr[3], current_tfidf*tf*Double.parseDouble(checkstr[1]));
+              }
+          }
+        } 
+      }
+      System.out.println(total);
       for (Map.Entry<String, Double> entry: map.entrySet()) {
         String id = entry.getKey();
         double score = entry.getValue().doubleValue();
-        result.add(new QueryHit(id, score));
+        result.add(new QueryHit(id, score/Math.sqrt(total)));
       }
       return result; 
     }
