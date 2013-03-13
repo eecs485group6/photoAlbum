@@ -43,14 +43,14 @@
       $message = "Your account with EECS485 Group6 Photo Album has been set up, $firstname $lastname."."\n".
                   "Your Username: $username"."\n".
                   "Your E-Mail: $email"."\n".
-				  "Please visit us often at http://eecs485-02.eecs.umich.edu:4506/mhGWdYAZ/pa2/welcome.php"."\n";
+				  "Please visit us often at http://".$_SERVER[HTTP_HOST].dirname($_SERVER[REQUEST_URI])."/welcome.php"."\n";
       $headers  = 'MIME-Version: 1.0' . "\r\n";
       $headers .= 'Content-Type: text/plain; charset=\"iso-8859-1\"' . "\r\n";
       $headers .= 'From: EECS485 Group6 Webservant <webservant@eecs.umich.edu>' . "\r\n";
       $headers .= 'Cc: qiliao@umich.edu' . "\r\n";
 	  // This is the function to send the email
       mail($sendto, $subject, $message, $headers);  
-      header("location: addnewuser.php");
+      header("location: addnewuser.php?username=$username");
     }
   }
 ?>

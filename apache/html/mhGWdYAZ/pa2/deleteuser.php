@@ -1,4 +1,5 @@
 <?php
+  include('authentication.php');
   $username = $_GET['username'];
   include_once("lib.php");
   db_connect();
@@ -8,6 +9,7 @@
 	deletealbum($albumid);
   }
   updateaccess($username);
+  session_destroy();
   db_close();
 ?>
   

@@ -2,9 +2,12 @@
   include('authentication.php');
   include ("lib.php");
   db_connect();
+  if(isset($_GET['username'])) $username = $_GET['username']; 
+
   $queryUser="SELECT * FROM User WHERE username= '$username'";
   $resultUser = mysql_query($queryUser);
   $arrayUser = mysql_fetch_array($resultUser, MYSQL_ASSOC);
+  $_SESSION['username'] = $username;
   $_SESSION['lastname'] = $arrayUser['lastname'];
   $_SESSION['firstname'] = $arrayUser['firstname'];
   $_SESSION['inactivity'] = time();
