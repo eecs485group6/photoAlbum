@@ -1,0 +1,32 @@
+html{background:#dcdcdc;color:#000}
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0}
+table{border-collapse:collapse;border-spacing:0}
+fieldset,img{border:0}
+ol,ul{list-style:none}
+body{color: #111;font-weight:400;font-size:13px;font-family: "Microsoft Yahei", "Trebuchet MS", Georgia,"Times New Roman",Times,sans-serif;line-height: 1.7;}
+code,pre{padding:0 3px 2px;color:#333;font-size:12px;font-family: Menlo,Monaco,Consolas,"Lucida Console","Courier New",monospace}
+code{padding:3px 4px;background-color:#f5f5f5}
+pre{display:block;margin:0 0 18px;padding:5px 7px;background-color:#F0F0F0;white-space:pre-wrap;font-size:12px;line-height:1.3em}
+pre.prettyprint{border:none;}
+pre code{padding:0;background-color:transparent}
+::selection{background:#c9302f;color:#fff;text-shadow:none}
+.alignleft{text-align:left}
+.alignright{text-align:right}
+.container{position:relative;overflow:hidden;margin:0 auto;padding:0 5px;width:820px}
+.block{position:relative;overflow:hidden;border:1px solid #ccc;background:#fcfcfa;box-shadow:0 0 10px rgba(0,0,0,0.1)}
+.inner {padding:30px;}
+[class^="icon-"],[class*=" icon-"]{display:inline-block;width:16px;height:16px;background:url("images/icons.png") no-repeat -16px -16px;vertical-align:text-top;line-height:16px}
+.icon-feed{background-position:-16px -16px}
+.icon-weibo{background-position:-48px -16px}
+.icon-twitter{background-position:-80px -16px}
+.alignright{ float: right;}
+.alignleft{ float: left;}
+
+#main-header{margin-bottom:20px;height:45px;border-bottom:1px solid #84201f;background:#bb3131;background:-moz-linear-gradient(top,#c63a3a 0,#c43837 29%,#c13635 55%,#bd3232 55%,#ba3030 77%,#b32b2b 100%);background:-webkit-linear-gradient(top,#c63a3a 0,#c43837 29%,#c13635 55%,#bd3232 55%,#ba3030 77%,#b32b2b 100%);background:-o-linear-gradient(top,#c63a3a 0,#c43837 29%,#c13635 55%,#bd3232 55%,#ba3030 77%,#b32b2b 100%);background:-ms-linear-gradient(top,#c63a3a 0,#c43837 29%,#c13635 55%,#bd3232 55%,#ba3030 77%,#b32b2b 100%);background:linear-gradient(to bottom,#c63a3a 0,#c43837 29%,#c13635 55%,#bd3232 55%,#ba3030 77%,#b32b2b 100%);box-shadow:0 1px 10px rgba(0,0,0,0.2)}
+#logo{float:left;color:#f5f5f5;font-size:30px;line-height:45px;}
+#main-header nav{position:absolute;top:0;right:5px}
+#main-header nav ul li{display:inline}
+#main-header nav ul li a{float:left;display:block;margin-left:20px;color:#ddd;font-weight:600;line-height:45px;font-family: 'Microsoft Yahei';}
+#main-header nav ul li a:hover{color:#fff}
+.title{margin-bottom:5px;font-weight:bold;font-size:1.8em;font-family:Pmingliu,Mingliu;line-height:1em}
+

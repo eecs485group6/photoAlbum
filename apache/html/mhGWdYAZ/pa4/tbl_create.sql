@@ -1,0 +1,89 @@
+# 3a: Create tables
+# the data should be created in the order according to the foreign key contraints
+# Please drop the tables before recreating them
+
+
+
+
+CREATE TABLE User (
+    username VARCHAR(20), 
+    firstname VARCHAR(20), 
+    lastname VARCHAR(20), 
+    password VARCHAR(20), 
+    email VARCHAR(40),
+    PRIMARY KEY (username))ENGINE=INNODB;
+
+
+CREATE TABLE Album (
+    albumid INT, 
+    title VARCHAR(50), 
+    created DATE, 
+    lastupdated DATE, 
+    access VARCHAR(10), 
+    username VARCHAR(20),
+    PRIMARY KEY (albumid),
+    FOREIGN KEY (username) REFERENCES User(username)
+    ON DELETE CASCADE ON UPDATE CASCADE)ENGINE=INNODB;
+
+CREATE TABLE Photo (
+    url VARCHAR(255),
+    format CHAR(3),
+    date DATE,
+    PRIMARY KEY(url))ENGINE=INNODB;
+
+
+CREATE TABLE Contain (
+    albumid INT, 
+    url VARCHAR(255), 
+    caption VARCHAR(255), 
+    sequencenum INT,
+    PRIMARY KEY(albumid,url),
+    FOREIGN KEY (albumid) REFERENCES Album(albumid)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (url) REFERENCES Photo(url)
+    ON DELETE CASCADE ON UPDATE CASCADE)ENGINE=INNODB;
+
+
+CREATE TABLE AlbumAccess (
+    albumid INT, 
+    username VARCHAR(20),
+    PRIMARY KEY(albumid,username),
+    FOREIGN KEY (username) REFERENCES User(username)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (albumid) REFERENCES Album(albumid)
+    ON DELETE CASCADE ON UPDATE CASCADE)ENGINE=INNODB;
+
+
+CREATE TABLE Comments (
+    commentid INT,
+    commentuser VARCHAR(20),
+    url VARCHAR(255),
+    comments VARCHAR(255),
+    PRIMARY KEY(commentid,url),
+    FOREIGN KEY (url) REFERENCES Photo(url)
+    ON DELETE CASCADE ON UPDATE CASCADE)ENGINE=INNODB;
+
+CREATE TABLE Data (
+    url VARCHAR(255) NOT NULL,
+    mime_type VARCHAR(255) NOT NULL,
+    file_size INT NOT NULL,
+    image_data MEDIUMBLOB NOT NULL,
+    PRIMARY KEY(url),
+    INDEX(url),
+    FOREIGN KEY (url) REFERENCES Photo(url)
+    ON DELETE CASCADE ON UPDATE CASCADE)ENGINE=INNODB;
+
+
+
+
+#show the created tables
+
+show tables;
+
+describe User;
+describe Album;
+describe Contain;
+describe Photo;
+describe AlbumAccess;
+describe Comments;
+describe Data;
