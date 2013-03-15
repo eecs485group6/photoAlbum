@@ -34,7 +34,11 @@
 ?>
   <form align='center' name="wordquery" class="form-search" action="search.php" method="get">
     <input type="text" class="input-medium search-query" name="q" placeholder="your query words...">
-    <button class="btn btn-primary" type="submit">Search</button>
+    <button class="btn btn-primary" type="submit">Search Words</button>
+  </form>
+  <form align='center' name="phrasequery" class="form-search" action="search.php" method="get">
+    <input type="text" class="input-medium search-query" name="phr" placeholder="your query phrase...">
+    <button class="btn btn-primary" type="submit">Search Phrase</button>
   </form>
 
 
@@ -52,7 +56,6 @@
   $query = $_GET['q'];
   $myResults = queryIndex(9000, "localhost", $query);
   usort($myResults, 'compare_score');
-  //var_dump($myResults);
   $ct = count($myResults);
   echo "<br><h4><p class='text-info' align='center'>".$ct." relevant photos are found for query $query:</p></h4>";
   echo "<table width='100%' height='100%' align='center' valign='center'>";
@@ -75,18 +78,41 @@
               <div> Related Score: $score </div>
           </td>
         </tr>  ";
-
-      
-      
-      //echo "<tr>";
-      //echo "<td><text style='font-size:18px;font-family:verdana;'>".$caption."</text></td>";
-      //echo "<td><img src='$url' height='60px'></td>";
-      //echo "<td width='200'><text style='font-size:18px;font-family:verdana;'>".$score."</tr>";
-      //echo "</tr>";
     }
   echo "</table>";
-  db_close();
   }
+  if (isset($_GET['phr']))
+  {
+  $queryphrase = $_GET['phr'];
+  $myResults = queryIndex2(9000, "localhost", $queryphrase);
+  usort($myResults, 'compare_score');
+  $ct = count($myResults);
+  echo "<br><h4><p class='text-info' align='center'>".$ct." relevant photos are found for query $query:</p></h4>";
+  echo "<table width='100%' height='100%' align='center' valign='center'>";
+
+  for ($i = 0; $i < $ct; $i++)
+    {
+      $num = $myResults[$i]['id'];
+      $result = mysql_query("SELECT * FROM Contain WHERE albumid = '5' AND sequencenum='$num'");
+      $row = mysql_fetch_array($result);
+      $url = $row['url'];
+      $caption = $row['caption'];
+      $score = $myResults[$i]['score'];
+      echo "
+        <tr algin='center'>
+          <td height='400px' align='center'>
+            <a href='".$prefix.$url.$prefix2.$albumid."'>
+              <img class='img-rounded center' src='$url' alt='$caption' title='$caption'>
+              </a>
+              <div> $caption </div>
+              <div> Related Score: $score </div>
+          </td>
+        </tr>  ";
+    }
+  echo "</table>";
+  }
+
+  db_close();
   ?>
   <?php page_footer(); ?>
 </body>

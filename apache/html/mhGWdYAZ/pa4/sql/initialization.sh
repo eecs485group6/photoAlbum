@@ -1,4 +1,4 @@
-#!/bin/bash
+#:x!/bin/bash
 
 umask 000
 rm -r -f ../pa1_images/*
@@ -22,7 +22,7 @@ mysql -u group6 --password=01302013 group6 < load_data_table10.sql
 
 mysql -u group6 --password=01302013 group6 < load_data_table11.sql
 
-mysql -u group6 --password=01302013 group6 < search.sql
-mysql -u group6 --password=01302013 group6 < search2.sql
+#mysql -u group6 --password=01302013 group6 < search.sql
+#mysql -u group6 --password=01302013 group6 < search2.sql
 
 
