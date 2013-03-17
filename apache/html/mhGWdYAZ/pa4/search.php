@@ -54,9 +54,9 @@
   if (isset($_GET['q'])) 
   {
   $query = $_GET['q'];
-  $myResults = queryIndex(9000, "localhost", $query);
-  usort($myResults, 'compare_score');
+  $myResults = queryIndex(2114, "localhost", $query);
   $ct = count($myResults);
+  if ($ct > 0) usort($myResults, 'compare_score');
   echo "<br><h4><p class='text-info' align='center'>".$ct." relevant photos are found for query $query:</p></h4>";
   echo "<table width='100%' height='100%' align='center' valign='center'>";
 
@@ -84,9 +84,9 @@
   if (isset($_GET['phr']))
   {
   $queryphrase = $_GET['phr'];
-  $myResults = queryIndex2(9000, "localhost", $queryphrase);
-  usort($myResults, 'compare_score');
+  $myResults = queryIndex2(2114, "localhost", $queryphrase);
   $ct = count($myResults);
+  if ($ct > 0) usort($myResults, 'compare_score');
   echo "<br><h4><p class='text-info' align='center'>".$ct." relevant photos are found for query $query:</p></h4>";
   echo "<table width='100%' height='100%' align='center' valign='center'>";
 

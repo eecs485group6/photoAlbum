@@ -1,6 +1,7 @@
 <?php
 include("authentication.php");
 include("lib.php");
+require("server.php");
 db_connect();
 
 //get info
@@ -86,13 +87,42 @@ if (isset($username) && isset($inactivity) && time() - $inactivity <= 300)
   else include("default/top.php");
 
 //changed by haixin start
-if (isset($_POST['url'])){
+if (isset($_POST['url'])) {
    $url=$_POST['url'];  
-  }else{
-$url=$_GET['url'];
+} else {
+  $url=$_GET['url'];
 }
+// add change caption function by Qi
+if (isset($_GET['newcaption'])){
+  $newcaption = $_GET['newcaption'];
+  $getseq = mysql_query("SELECT sequencenum FROM Contain WHERE albumid = '$albumid' AND url = '$url'");
+  $seqrow = mysql_fetch_array($getseq, MYSQL_ASSOC);
+  $sequencenum = $seqrow['sequencenum'];
+  mysql_query("UPDATE Contain SET caption=\"$newcaption\" WHERE url='$url' AND albumid=$albumid");
+  $status = true;
+  if ($albumid == 5) {
+    $status = updateCaption($sequencenum, $newcaption,2114,'localhost');
+  }
+  if ($status == true) {
+    echo "<div class='alert alert-success'>
+                  <button type='button' class='close' data-dismiss='alert'>
+                                  &times;
+                  </button>
+                  <strong>Great!</strong> Caption has been successfully updated to '$newcaption'
+                            .</div>";
+  }
+  else {
+    echo "<div class='alert alert-error'>
+                  <button type='button' class='close' data-dismiss='alert'>
+                                  &times;
+                  </button>
+                  <strong>Oh snap!</strong> Caption cannot be updated to '$newcaption'
+                            .</div>";
+  }
 
-    
+}    
+  
+  
   $getcap=mysql_query("SELECT * FROM Contain WHERE albumid = '$albumid' AND url = '$url'") or die("Query failed. ". mysql_error());
   $caprow=mysql_fetch_array($getcap, MYSQL_ASSOC);
   $caption = $caprow['caption'];
@@ -216,18 +246,25 @@ Here is the picture. You may send it to your email by filling the email box and 
 
     while ($array = mysql_fetch_array($result, MYSQL_ASSOC)) {
       echo "<div><img src='".$array['url'] ."' class='img-rounded'></div>";
-      echo " caption:".$caption." date:".$array['date']." format:".$array['format'];
+      echo "<h4>Caption: ".$caption."</h4>";
+      echo "<form action=\"viewpicture.php \" method=\"GET\">
+       <input type=\"text\" name=\"newcaption\" placeholder=\"Enter new caption ...\">
+       <input type=\"hidden\"name=\"url\" value=\"$url\">
+       <input type=\"hidden\"name=\"albumid\" value=$albumid>
+       <button class=\"btn btn-primary\" type=\"submit\">Change Caption</button></form>";
+      echo "Date: ".$array['date']."   Format: ".$array['format'];
     }
     $queryTest="SELECT sequencenum FROM Contain 
         WHERE url = '$url' AND albumid = $albumid";
     $resultTest=mysql_query($queryTest) or die("Query failed. ". mysql_error());
 
     while ($arrayTest = mysql_fetch_array($resultTest, MYSQL_ASSOC)) {
-        echo "<br>Sequencenum:".$arrayTest['sequencenum'];
+        echo "   Sequencenum: ".$arrayTest['sequencenum'];
     }
  
     db_close();
 ?>
+
 <!-- button to trigger modal -->
 <a href="#myModal" role="button" class="btn" data-toggle="modal"><i class="icon-envelope"></i></a>
 </div>
@@ -309,7 +346,7 @@ $filename = basename($url).PHP_EOL;
 ?>
 
 <?php
-echo " <form action= \"viewpicture.php \" method=  \"POST\">
+echo " <br><br><form action= \"viewpicture.php \" method=  \"POST\">
        Name:<br><input type=\"text\" name=\"name\" placeholder=\"Please enter your name\"> <br>
        Comment:<br>
        <textarea rows=\"4\" cols=\"50\" name=\"comment\">
@@ -359,7 +396,7 @@ echo "
 
 } else {
 
-echo "<h3>There is no comment on $filename ,be the first to comment!</h3>";
+echo "<h3>There is no comment on $caption, be the first to comment!</h3>";
 }
 
 // Add by Qi --- similar photos search
@@ -368,12 +405,11 @@ echo "<h3>There is no comment on $filename ,be the first to comment!</h3>";
   function compare_score($a, $b) {
     return strcmp($b['score'], $a['score']);
   }
-  require "server.php";
   $query = $caption;
-  $myResults = queryIndex(9000, "localhost", $query);
-  usort($myResults, 'compare_score');
-  //var_dump($myResults);
+  $myResults = queryIndex(2114, "localhost", $query);
   $ct = count($myResults);
+  if ($ct > 0) usort($myResults, 'compare_score');
+  //var_dump($myResults);
   echo "<br><h4><p class='text-info' align='center'>In addition, ".$ct." similar photos are found, click to see them individually:</h4>";
   echo "<table width='100%' height='100%' align='center' valign='center'>";
 

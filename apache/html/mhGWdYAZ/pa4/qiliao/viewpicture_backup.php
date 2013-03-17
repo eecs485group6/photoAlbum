@@ -1,23 +1,90 @@
+<?php
+include("authentication.php");
+include("lib.php");
+db_connect();
+
+//get info
+
+if (isset($_POST['albumid'])){
+   $albumid=$_POST['albumid'];
+}else{
+  $albumid=$_GET['albumid'];
+}
+
+$query = "SELECT * FROM Album WHERE albumid = '$albumid'";
+$result = mysql_query($query);
+$title = mysql_result($result, 0, 'title');
+$owner = mysql_result($result, 0, 'username');
+$access = mysql_result($result, 0, 'access');
+
+//check if log in
+if (isset($inactivity) && time() - $inactivity <= 300) {
+  $_SESSION['inactivity'] = time();
+  if (empty($_SESSION['lastname']) && empty($_SESSION['firstname'])) {
+    $queryUser="SELECT * FROM User WHERE username= '$username'";
+    $resultUser = mysql_query($queryUser);
+    while ($arrayUser = mysql_fetch_array($resultUser, MYSQL_ASSOC)) {
+      $_SESSION['lastname'] = $arrayUser['lastname'];
+      $_SESSION['firstname'] = $arrayUser['firstname'];
+    }
+  }
+  if ($access == 'private' && $owner != $username && empty($_SESSION['admin'])) {
+    $queryAccess = "SELECT * FROM AlbumAccess WHERE username = '$username' AND albumid = '$albumid'";
+    $resultAccess = mysql_query($queryAccess);
+    $numAccess = mysql_num_rows($resultAccess);
+    //logged in, but no permission.
+    if (!$numAccess) {
+      $_SESSION['url'] = $_SERVER['REQUEST_URI'];
+        ob_start();
+        header("Location:nopermission.php");
+        ob_end_flush();
+    }
+  }
+}
+// no login, and album is private
+else if ($access == 'private' && empty($username)) {
+  $_SESSION['url'] = $_SERVER['REQUEST_URI'];
+  ob_start();
+  header("Location:welcome.php");
+  ob_end_flush();
+}
+// login expired, album is private. fire relogin.
+else if ($access == 'private') {
+  $_SESSION['url'] = $_SERVER['REQUEST_URI'];
+  $_SESSION['relogin'] = true;
+  ob_start();
+  header("Location:welcome.php");
+  ob_end_flush();
+}
+
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
-<?php include ("lib.php"); ?>
 <?php page_header("Picture"); ?>
 <?php include("default/head.php"); ?>
 <style>
-  body {
-    height: 100%;
+  .center {
+    height:200px;
+    background-color:#b0e0e6;
+  } 
+  .center-table
+  {
+    margin: 0 auto;
+    float: none;
   }
-.center-table
-{
-  margin: 0 auto;
-  float: none;
-}
 </style>
 </head>
 <body>
+
+
 <?php
-  include("default/top.php");
+// TODO: care. This account may be exipred. may have different 
+if (isset($username) && isset($inactivity) && time() - $inactivity <= 300)
+    include ("default/top_logged.php");
+  else include("default/top.php");
+
 //changed by haixin start
 if (isset($_POST['url'])){
    $url=$_POST['url'];  
@@ -25,16 +92,50 @@ if (isset($_POST['url'])){
 $url=$_GET['url'];
 }
 
+    
+  $getcap=mysql_query("SELECT * FROM Contain WHERE albumid = '$albumid' AND url = '$url'") or die("Query failed. ". mysql_error());
+  $caprow=mysql_fetch_array($getcap, MYSQL_ASSOC);
+  $caption = $caprow['caption'];
 
-if (isset($_POST['albumid'])){
-   $albumid=$_POST['albumid'];
-  }else{
-$albumid=$_GET['albumid'];
-}
 
+?>
+
+<!-- breadcrumb begins -->
+<div class="row">
+  <div class="span10">
+  <ul class="breadcrumb">
+    <li>
+      <a href="index.php">Home</a> <span class="divider" style="color: #0c0c0c">></span>
+    </li>
+    <li>
+<?php    
+      echo
+        "<a href='editalbumlist.php?username=$owner'>$owner albumlist</a> <span class='divider' style='color: #0c0c0c'>></span>";
+?>     
+    </li>
+    <li>
+<?php
+    echo
+      "<a href='viewalbum.php?albumid=$albumid'>Album $title</a> <span class='divider' style='color: #0c0c0c'>></span>";
+?>
+    </li>
+
+    <li class="active">
+<?php
+       echo "<a href='#'>Picture $caption</a>";
+?>
+    </li>
+  </ul>
+  </div>
+  </div>
+<!-- breadcrumb ends -->
+
+<?php
 //    $albumid = $_GET['albumid'];
 
 //changed by haixin end
+
+
 
 
 
@@ -51,7 +152,7 @@ $albumid=$_GET['albumid'];
     if ($result2) {
         while ($array2 = mysql_fetch_array($result2, MYSQL_ASSOC)) {
           if ($array2['url'] != NULL) {
-                echo "<a class='btn' href='viewpicture.php?url=".$array2['url']
+		echo "<a class='btn' href='viewpicture.php?url=".$array2['url']
                   ."&albumid=".$albumid."'><i class='icon-arrow-left'></i></a>";
                /*
                 echo "<form action = \" viewpicture.php \" method = \"GET\">
@@ -92,6 +193,13 @@ $albumid=$_GET['albumid'];
     }
     echo "</li></ul>";
 ?>
+
+
+	<form action='viewalbum.php' method='GET'>
+      	<input type = 'hidden' name='albumid' value = <?php echo $albumid; ?>>
+      	<input class='btn btn-success' type='submit' value ='Back to album'>
+      	</form>
+
 <!-- Info text
 <h3><p class="text-info"> 
 Here is the picture. You may send it to your email by filling the email box and click on Email Picture button. 
@@ -102,10 +210,13 @@ Here is the picture. You may send it to your email by filling the email box and 
     // The Image
     $query="SELECT * FROM Photo WHERE url = '$url' ";
     $result=mysql_query($query) or die("Query failed. ". mysql_error());
+    $getcap=mysql_query("SELECT * FROM Contain WHERE albumid = '$albumid' AND url = '$url'") or die("Query failed. ". mysql_error());
+    $caprow=mysql_fetch_array($getcap, MYSQL_ASSOC);
+    $caption = $caprow['caption'];
 
     while ($array = mysql_fetch_array($result, MYSQL_ASSOC)) {
       echo "<div><img src='".$array['url'] ."' class='img-rounded'></div>";
-      echo "date:".$array['date']." format:".$array['format'];
+      echo " caption:".$caption." date:".$array['date']." format:".$array['format'];
     }
     $queryTest="SELECT sequencenum FROM Contain 
         WHERE url = '$url' AND albumid = $albumid";
@@ -117,24 +228,46 @@ Here is the picture. You may send it to your email by filling the email box and 
  
     db_close();
 ?>
-<?php
-    echo "<a class='btn' href='viewpicturewithbytes.php?url=$url&albumid=$albumid'>
-          <i class='icon-list-alt'></i></a>";
-?>
+<!-- button to trigger modal -->
+<a href="#myModal" role="button" class="btn" data-toggle="modal"><i class="icon-envelope"></i></a>
+</div>
+<!-- Modal-->
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+    <h4 id="myModalLabel">Mail the picture</h4>
+  </div>
+  <div class="modal-body">
+    <p>Your Email:
+    <input id = "email" type="text" name="email"
+    placeholder="Your email address..."><br>
+    <?php
+      echo "<input id = 'url' type='hidden' name='url' value='$url'>";
+    ?>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button class="btn btn-primary" type="button" id="sendEmailButton">Send Email</button>
+  </div>
 </div>
 
+
+
 <div style="text-align:center">
+<!-- Previous Email Block
 <p>
 Your Email:
 <input id = "email" type="text" name="email"
 placeholder="Your email address..."><br>
 <?php
-    echo "<input id = 'url' type='hidden' name='url' value='$url'>";
+    //echo "<input id = 'url' type='hidden' name='url' value='$url'>";
 ?>
 </p>
 <button class="btn btn-primary" type="button" id="sendEmailButton" name="filter">
 Send Email
 </button>
+-->
 
 <!--change made by haixin start-->
 <!--change made by haixin end-->
@@ -185,11 +318,8 @@ echo " <form action= \"viewpicture.php \" method=  \"POST\">
        <input type=\"hidden\"name=\"albumid\" value=$albumid>
        <input class=\"btn btn-primary\" type=\"submit\" value=\"Send Comment\"></form>";
 //echo"<td>         </td></tr>";
-
-
-
-
 ?>
+
 <?php
 db_connect();
 
@@ -200,7 +330,7 @@ $num = mysql_numrows($result);
 
 if($num > 0){
 
-echo "<h3>Comments on $filename </h3>";
+//echo "<h3>Comments on $filename </h3>";
 
 echo "<div class=\"span12 center-table\">
  <table class=\"table table-hover\">
@@ -232,6 +362,52 @@ echo "
 echo "<h3>There is no comment on $filename ,be the first to comment!</h3>";
 }
 
+// Add by Qi --- similar photos search
+  $prefix = "viewpicture.php?url="; 
+  $prefix2 = "&albumid=";
+  function compare_score($a, $b) {
+    return strcmp($b['score'], $a['score']);
+  }
+  require "server.php";
+  $query = $caption;
+  $myResults = queryIndex(9000, "localhost", $query);
+  usort($myResults, 'compare_score');
+  //var_dump($myResults);
+  $ct = count($myResults);
+  echo "<br><h4><p class='text-info' align='center'>In addition, ".$ct." similar photos are found, click to see them individually:</h4>";
+  echo "<table width='100%' height='100%' align='center' valign='center'>";
+
+  for ($i = 0; $i < $ct; $i++)
+    {
+      $num = $myResults[$i]['id'];
+      $result = mysql_query("SELECT * FROM Contain WHERE albumid = '5' AND sequencenum='$num'");
+      $row = mysql_fetch_array($result);
+      $url = $row['url'];
+      $caption = $row['caption'];
+      $score = $myResults[$i]['score'];
+      if ($i % 3 == 0)
+        echo "<tr align='center'> ";
+      echo "
+          <td height='300px' align='center'>
+            <a href='".$prefix.$url.$prefix2."5'>
+              <img class='img-rounded center' src='$url' alt='$caption' title='$caption'>
+            </a>
+            <div> $caption </div>
+            <div> Related Score: $score </div>
+          </td>";
+      if ($i % 3 == 2)
+        echo "</tr>";
+    }
+  echo "</table>";
+
+
+
+
+
+// end of similar photos search
+
+
+
 db_close();
 
 
@@ -253,7 +429,9 @@ $(function(){
     $("#sendEmailButton").click(function() {
       var email = $("#email").val();
       var url = $("#url").val();
+      console.log('url='+url+' email='+email);
       MakeRequest(email, url);
+      $('#myModal').modal('hide');
     });
 });
 </script>

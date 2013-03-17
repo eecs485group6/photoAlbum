@@ -64,5 +64,5 @@
 ?>
 <!DOCTYPE html>
   <head>
-  <!--<META HTTP-EQUIV="refresh" CONTENT="5; URL='../index.php'">-->
+  <META HTTP-EQUIV="refresh" CONTENT="10; URL='../index.php'">
   </head>

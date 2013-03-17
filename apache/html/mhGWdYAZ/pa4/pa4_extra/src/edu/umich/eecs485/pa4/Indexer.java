@@ -6,6 +6,11 @@ import java.io.FileNotFoundException;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.*;
+import java.io.IOException;
+
+import java.sql.*;
+import java.util.Properties;
+
 
 /*********************************************************
  * <code>Indexer</code> reads in some raw content and writes to
@@ -26,6 +31,15 @@ public class Indexer {
     HashMap<String, HashMap<Integer, ArrayList<Integer>>> map = new HashMap<String, HashMap<Integer, ArrayList<Integer>>>();
     HashMap<Integer, Double> tfidf_normalization = new HashMap<Integer, Double>();
     HashSet<String> hs = new HashSet<String>(); 
+    int picid = 0;
+    HashMap<Integer, String> captions = new HashMap<Integer, String>();
+    String db_name = "group6";
+    String db_user = "group6";
+    String db_pass = "01302013";
+    Connection conn = null;
+    Statement statement = null;
+    ResultSet resultSet = null;
+
     try {
       File f = new File("Redirecting.txt");
       FileWriter fw = new FileWriter(outputFile.getAbsoluteFile());
@@ -33,13 +47,26 @@ public class Indexer {
       Scanner prescan = new Scanner(f);
       while (prescan.hasNext()) {
         hs.add(prescan.nextLine());
-      }      
-      Scanner scan = new Scanner(contentFile);
-      int picid = 0;
-      while (scan.hasNext()) {
-        String s = scan.nextLine();
+      }
+      // content file captions is broken. Do not use it.
+      // connect to mysql to get all the current captions.
+      //Scanner scan = new Scanner(contentFile);
+            System.out.println("Connecting to mysql DB...");
+      String db_url = "jdbc:mysql://localhost:3306/" + db_name;
+      
+      Class.forName("com.mysql.jdbc.Driver").newInstance();
+
+      conn = DriverManager.getConnection(db_url, db_user, db_pass);
+
+      statement = conn.createStatement();
+
+      String queryString = "SELECT caption, sequencenum FROM Contain WHERE albumid=5 ORDER BY sequencenum";
+      resultSet = statement.executeQuery(queryString);
+      while (resultSet.next()) {
+        String s = resultSet.getString("caption");
+        picid = Integer.parseInt(resultSet.getString("sequencenum"));
         if (s.equals("")) continue;
-        picid++;
+        //picid++;
         String[] subS = s.split("\\s*[^0-9a-zA-Z']+\\s*"); 
         // regex: 0 or multi spaces and one or more character between them
         for (int i = 0; i < subS.length; i++) {
@@ -116,10 +143,26 @@ public class Indexer {
       bw.flush();
       bw.close();
     }
-    catch (IOException fnfe) {
-      System.err.println(fnfe.getMessage());
+    catch (Exception e) {
+      System.err.println("cannot connect mysql server");
     }
-    
+    finally {
+      try {
+        if (resultSet != null)
+          resultSet.close();
+
+        if (statement != null)
+          statement.close();
+
+
+        if (conn != null)
+          conn.close();
+
+      } catch (Exception e) {
+        System.err.println("sql close error");
+      }
+    }
+
   }
 
   /**

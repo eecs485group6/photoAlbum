@@ -112,11 +112,11 @@
   <target name="check-indexer-args">
     <fail unless="in">
       Must specify the parameter: in
-      Example: "ant run-indexer -Din=yourinputfile -Dout=youroutputfile"
+      Example: "ant run-indexer -Din=search.xml -Dout=index.txt"
     </fail>
     <fail unless="in">
       Must specify the parameter: in 
-      Example:"ant run-indexer -Din=yourinputfile -Dout=youroutputfile"
+      Example:"ant run-indexer -Din=search.xml -Dout=index.txt"
     </fail>
   </target>
 
@@ -133,11 +133,11 @@
   <target name="check-server-args">
     <fail unless="port">
       Must specify the parameter: port 
-      Example: "ant run-server -Dport=9000 -Dfname=test.txt"
+      Example: "ant run-server -Dport=2114 -Dfname=index.txt"
     </fail>
     <fail unless="fname">
       Must specify the parameter: fname 
-      Example: "ant run-indexer -Dport=9000 -Dfname=test.txt"
+      Example: "ant run-indexer -Dport=2114 -Dfname=index.txt"
     </fail>
   </target>
 

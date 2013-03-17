@@ -120,7 +120,7 @@ public abstract class GenericIndexServer {
               queryStr = val;
             }
           }
-          List<QueryHit> hits = processQuery(queryStr);
+          List<QueryHit> hits = processQuery2(queryStr);
           //List<QueryHit> hits = processQuery2(queryStr);
           JSONArray hitlist = new JSONArray();
           for (QueryHit qh: hits) {
@@ -133,6 +133,29 @@ public abstract class GenericIndexServer {
           JSONObject resultObj = new JSONObject();
           resultObj.put("hits", hitlist);
 
+          StringWriter out = new StringWriter();
+          resultObj.writeJSONString(out);
+          responseBody.write((out.toString()).getBytes());
+        }
+
+        if ("/updatecaption".equals(path)) {
+          int sequencenum = 0;
+          String caption = null;
+          String query = uri.getQuery();
+          String elements[] = query.split("&");
+          for (String elt: elements) {
+            String name = elt.split("=")[0];
+            String val = URLDecoder.decode(elt.split("=")[1], "UTF-8");
+            if ("sequencenum".equals(name)) {
+              sequencenum = Integer.parseInt(val);
+            }
+            if ("caption".equals(name)) {
+              caption = val;
+            }
+          }
+          boolean ok = updateCaption(sequencenum, caption);
+          JSONObject resultObj = new JSONObject();
+          resultObj.put("status", ok);
           StringWriter out = new StringWriter();
           resultObj.writeJSONString(out);
           responseBody.write((out.toString()).getBytes());
@@ -157,4 +180,6 @@ public abstract class GenericIndexServer {
    */
   public abstract void initServer(File fname);
   public abstract List<QueryHit> processQuery(String query);
+  public abstract List<QueryHit> processQuery2(String queryStr);
+  public abstract boolean updateCaption(int sequencenum, String caption);
 }
