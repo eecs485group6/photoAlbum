@@ -323,6 +323,7 @@ public class IndexServer extends GenericIndexServer {
     System.out.println("Update "+sequencenum+": "+oldcaption+" -> "+newcaption);
     String [] words = oldcaption.split("\\s*[^0-9a-zA-Z']+\\s*");
     for (int i = 0; i < words.length; i++) {
+      words[i] = words[i].toLowerCase();
       HashMap<Integer, HashSet<Integer>> HM = map.get(words[i]);
       HM.remove(sequencenum);
       map.put(words[i], HM);
@@ -330,6 +331,7 @@ public class IndexServer extends GenericIndexServer {
     captions.put(sequencenum, newcaption);
     words = newcaption.split("\\s*[^0-9a-zA-Z']+\\s*");
     for (int i = 0; i < words.length; i++) {
+      words[i] = words[i].toLowerCase();
       if (map.containsKey(words[i])) {
         HashMap<Integer, HashSet<Integer>> now = map.get(words[i]);
         HashSet<Integer> posHS;

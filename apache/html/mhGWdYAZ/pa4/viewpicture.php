@@ -116,7 +116,7 @@ if (isset($_GET['newcaption'])){
                   <button type='button' class='close' data-dismiss='alert'>
                                   &times;
                   </button>
-                  <strong>Oh snap!</strong> Caption cannot be updated to '$newcaption'
+                  <strong>Oh snap!</strong> Caption cannot be updated to '$newcaption' sequencenum is $sequencenum status=$status
                             .</div>";
   }
 

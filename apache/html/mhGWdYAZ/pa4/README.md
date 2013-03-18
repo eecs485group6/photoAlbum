@@ -32,9 +32,17 @@ Get Started
 -----------
 0. prerequiste: insert data into mysql database
 
-1. run the indexer by entering pa4_extra folder, then type `ant run-indexer -Din=captions -Dout=index.txt` You can check the indexer result in index.txt (For checking the normal inverted index tables, you may want to look into pa4_java/index.txt. This is the normal version which has the exactly same result as the sample one. the new index.txt under pa4_extra saves extra position information without calculating any scores.)
+1. run the indexer by entering pa4_extra folder, then type 
 
-2. run the server by typing `ant run-server -Dport=2114 -Dfname=index.txt` Our port is 2114. The server will start.  
+'ant run-indexer -Din=captions -Dout=index.txt' 
+
+You can check the indexer result in index.txt (For checking the normal inverted index tables, you may want to look into pa4_java/index.txt. This is the normal version (the index without the extra position information required by extra point 1) which has the exactly same result as the sample given in the handout. the new index.txt under pa4_extra saves extra position information without calculating any scores.)
+
+2. Still under the pa4_extra folder, run the server by typing 
+
+'ant run-server -Dport=2114 -Dfname=index.txt' 
+
+Our port is 2114. The server will start.  
 
 3. now you can check the website to do normal query/phrase query/similar photo query/change caption.
 
@@ -51,12 +59,15 @@ word     doc contains the word     tf_doc
 
 We have a hashmap of words. For each word, we have a hashmap which contains docid of doc that contains this word. the value of this hashmap is tf_doc, the term frequency of the word appearing in the doc. To get nk for calculation of idf, we simply aggregate tf_doc in each doc for this word.
 
-Two types of queries are presented in this project. One is normal query, which query each single word in the querywords and aggregate each result. The other is phrase query, which will treat query as a whole. Only photos that strictly contain the query in the right order can be returned. 
+Two types of queries are presented in this project. One is normal query, which query each single word in the querywords and aggregate each result. The other is phrase query, which will treat query as a whole; only photos that strictly contain the entire phrase in the right order can be returned. 
 
 We filter out stopwords in this step. Stopwords will have 0 tfidf assigned. In normal query which allow AND operation to search the result, we will not use stopwords to find docs. On the other hand, when using phrase search which require strictly containing phrase in right order, we will still use stopwords to find docs, even through they have no weight to affect scores.
      
 Search.php (DONE)
 --------------------------------------
+
+A link to search.php is on the header bar on the very right on our album webpages.
+
 There are links on the top bar called 'search photos' to this page. you can process your queries on this page, by typing in your querywords and click on desired button. Normal query and phrase query are provided here. The query result is formatted in highest to lowest order of relavant score. 
 
 finding similar pictures in viewpicture.php(DONE)
