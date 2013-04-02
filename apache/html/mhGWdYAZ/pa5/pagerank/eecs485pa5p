@@ -1,0 +1,2 @@
+#!/bin/bash
+java -Xms256m -Xmx15g -jar dist/PageRank.jar $1 $2 $3 $4 $5
